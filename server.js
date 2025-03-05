@@ -80,7 +80,25 @@ app.use("*", async (req, res, next) => {
 
 // In production, serve static files from the dist directory
 if (!isDev) {
-  app.use(express.static("./dist/client", { index: false }));
+  // Serve static assets with proper MIME types and caching
+  app.use(express.static("./dist/client", { 
+    index: false,
+    etag: true,
+    lastModified: true,
+    maxAge: '1d'
+  }));
+  
+  // Explicitly serve CSS files with proper content type
+  app.get('*.css', (req, res, next) => {
+    res.set('Content-Type', 'text/css');
+    next();
+  });
+  
+  // Explicitly serve JS files with proper content type
+  app.get('*.js', (req, res, next) => {
+    res.set('Content-Type', 'application/javascript');
+    next();
+  });
 }
 
 app.listen(port, "0.0.0.0", () => {
